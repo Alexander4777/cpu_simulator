@@ -1,0 +1,45 @@
+.cpu-view {
+  padding: 20px;
+}
+
+.cpu-view h2 {
+  color: #61dafb;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.cpu-container {
+  display: grid;
+  grid-template-columns: 250px 300px 1fr;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cpu-left,
+.cpu-center,
+.cpu-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 1200px) {
+  .cpu-container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cpu-right {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .cpu-container {
+    grid-template-columns: 1fr;
+  }
+
+  .cpu-right {
+    grid-column: span 1;
+  }
+}

@@ -1,0 +1,83 @@
+static void m68ki_build_opcode_table(void)
+{
+  const opcode_handler_struct *ostruct;
+  int instr;
+  int i;
+  int j;
+
+  for(i = 0; i < 0x10000; i++)
+  {
+    /* default to illegal */
+    m68ki_instruction_jump_table[i] = m68k_op_illegal;
+    m68ki_cycles[i] = 4;
+  }
+
+  ostruct = &m68k_opcode_handler_table[0];
+  while(ostruct->mask != 0xff00)
+  {
+    for(i = 0;i < 0x10000;i++)
+    {
+      if((i & ostruct->mask) == ostruct->match)
+      {
+        m68ki_instruction_jump_table[i] = ostruct->opcode_handler;
+        m68ki_cycles[i] = ostruct->cycles * MUL;
+      }
+    }
+    ostruct++;
+  }
+  while(ostruct->mask == 0xff00)
+  {
+    for(i = 0;i <= 0xff;i++)
+    {
+      m68ki_instruction_jump_table[ostruct->match | i] = ostruct->opcode_handler;
+      m68ki_cycles[ostruct->match | i] = ostruct->cycles * MUL;
+    }
+    ostruct++;
+  }
+  while(ostruct->mask == 0xf1f8)
+  {
+    for(i = 0;i < 8;i++)
+    {
+      for(j = 0;j < 8;j++)
+      {
+        instr = ostruct->match | (i << 9) | j;
+        m68ki_instruction_jump_table[instr] = ostruct->opcode_handler;
+        m68ki_cycles[instr] = ostruct->cycles * MUL;
+      }
+    }
+    ostruct++;
+  }
+  while(ostruct->mask == 0xfff0)
+  {
+    for(i = 0;i <= 0x0f;i++)
+    {
+      m68ki_instruction_jump_table[ostruct->match | i] = ostruct->opcode_handler;
+      m68ki_cycles[ostruct->match | i] = ostruct->cycles * MUL;
+    }
+    ostruct++;
+  }
+  while(ostruct->mask == 0xf1ff)
+  {
+    for(i = 0;i <= 0x07;i++)
+    {
+      m68ki_instruction_jump_table[ostruct->match | (i << 9)] = ostruct->opcode_handler;
+      m68ki_cycles[ostruct->match | (i << 9)] = ostruct->cycles * MUL;
+    }
+    ostruct++;
+  }
+  while(ostruct->mask == 0xfff8)
+  {
+    for(i = 0;i <= 0x07;i++)
+    {
+      m68ki_instruction_jump_table[ostruct->match | i] = ostruct->opcode_handler;
+      m68ki_cycles[ostruct->match | i] = ostruct->cycles * MUL;
+    }
+    ostruct++;
+  }
+  while(ostruct->mask == 0xffff)
+  {
+    m68ki_instruction_jump_table[ostruct->match] = ostruct->opcode_handler;
+    m68ki_cycles[ostruct->match] = ostruct->cycles * MUL;
+    ostruct++;
+  }
+}

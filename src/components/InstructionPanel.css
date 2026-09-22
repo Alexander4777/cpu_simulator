@@ -1,0 +1,49 @@
+.instruction-panel {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.instruction-panel h3 {
+  color: #61dafb;
+  margin-bottom: 10px;
+}
+
+.no-instructions {
+  color: #666;
+  font-style: italic;
+}
+
+.instructions-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.instruction-item {
+  display: flex;
+  gap: 10px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.instruction-item.current {
+  background: #2d5016;
+  border: 1px solid #98c379;
+}
+
+.instr-address {
+  color: #888;
+}
+
+.instr-opcode {
+  color: #c678dd;
+  font-weight: bold;
+}
+
+.instr-operand {
+  color: #e5c07b;
+}

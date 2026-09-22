@@ -1,0 +1,47 @@
+.memory-view {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.memory-view h3 {
+  color: #61dafb;
+  margin-bottom: 10px;
+}
+
+.memory-grid {
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.memory-row {
+  display: flex;
+  margin-bottom: 2px;
+}
+
+.memory-address {
+  color: #888;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.memory-cells {
+  display: flex;
+  gap: 2px;
+}
+
+.memory-cell {
+  display: inline-block;
+  width: 20px;
+  text-align: center;
+  color: #ccc;
+  background: #2a2a2a;
+  border-radius: 2px;
+  padding: 2px 0;
+}
+
+.memory-cell.highlighted {
+  background: #61dafb;
+  color: #1e1e1e;
+}

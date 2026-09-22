@@ -1,0 +1,53 @@
+.app {
+  min-height: 100vh;
+  background: #0d0d0d;
+  color: #abb2bf;
+}
+
+.app-header {
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
+  padding: 20px;
+  text-align: center;
+}
+
+.app-header h1 {
+  color: #61dafb;
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.app-header p {
+  color: #888;
+  margin: 0;
+  font-size: 14px;
+}
+
+.app-content {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.editor-section {
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+}
+
+.simulator-section {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .app-content {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-section {
+    position: static;
+  }
+}
