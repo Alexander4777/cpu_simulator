@@ -1,13 +1,18 @@
 import React from 'react';
-import type { Instruction } from '../types/cpu';
+import type { M68kInstruction } from '../types/cpu';
+import { toHexString } from '../utils/assembler';
 import './InstructionPanel.css';
 
 interface InstructionPanelProps {
-  instructions: Instruction[];
-  currentPC?: number;
+  instructions: M68kInstruction[];
+  currentAddress?: number;
 }
 
-export const InstructionPanel: React.FC<InstructionPanelProps> = ({ instructions, currentPC }) => {
+function joinHex(values: number[]): string {
+  return values.map(v => toHexString(v, 4)).join(' ');
+}
+
+export const InstructionPanel: React.FC<InstructionPanelProps> = ({ instructions, currentAddress }) => {
   return (
     <div className="instruction-panel">
       <h3>Instrucciones</h3>
@@ -15,24 +20,23 @@ export const InstructionPanel: React.FC<InstructionPanelProps> = ({ instructions
         <p className="no-instructions">No hay instrucciones cargadas</p>
       ) : (
         <div className="instructions-list">
-          {instructions.map((instr, idx) => (
-            <div
-              key={idx}
-              className={`instruction-item ${instr.address === currentPC ? 'current' : ''}`}
-            >
-              <span className="instr-address">0x{toHexString(instr.address)}</span>
-              <span className="instr-opcode">{instr.opcode}</span>
-              <span className="instr-operand">
-                {instr.operand !== undefined ? `0x${toHexString(instr.operand)}` : ''}
-              </span>
-            </div>
-          ))}
+          {instructions.map((instr, idx) => {
+            const allWords = [instr.opcodeWord, ...instr.extensionWords];
+            const isCurrent = instr.address === currentAddress;
+            return (
+              <div
+                key={idx}
+                className={`instruction-item ${isCurrent ? 'current' : ''}`}
+              >
+                <span className="instr-address">0x{toHexString(instr.address, 4)}</span>
+                <span className="instr-bytes">{joinHex(allWords)}</span>
+                <span className="instr-mnemonic">{instr.decoded ?? instr.handlerName ?? '???'}</span>
+                <span className="instr-cycles">{instr.cycles > 0 ? `${instr.cycles}c` : ''}</span>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
   );
 };
-
-function toHexString(value: number): string {
-  return value.toString(16).padStart(2, '0').toUpperCase();
-}

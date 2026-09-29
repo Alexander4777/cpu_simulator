@@ -4,13 +4,13 @@ import { MemoryView } from './MemoryView';
 import { InstructionPanel } from './InstructionPanel';
 import { OutputPanel } from './OutputPanel';
 import { ControlPanel } from './ControlPanel';
-import type { CPUState, Memory, Instruction } from '../types/cpu';
+import type { M68kCPUState, Memory, M68kInstruction } from '../types/cpu';
 import './CPUView.css';
 
 interface CPUViewProps {
-  cpu: CPUState;
+  cpu: M68kCPUState;
   memory: Memory;
-  instructions: Instruction[];
+  instructions: M68kInstruction[];
   output: string[];
   isRunning: boolean;
   isHalted: boolean;
@@ -22,21 +22,12 @@ interface CPUViewProps {
 }
 
 export const CPUView: React.FC<CPUViewProps> = ({
-  cpu,
-  memory,
-  instructions,
-  output,
-  isRunning,
-  isHalted,
-  cycleCount,
-  onRun,
-  onStep,
-  onReset,
-  onAssemble,
+  cpu, memory, instructions, output, isRunning, isHalted, cycleCount,
+  onRun, onStep, onReset, onAssemble,
 }) => {
   return (
     <div className="cpu-view">
-      <h2>Simulador de CPU</h2>
+      <h2>CPU Motorola 68000</h2>
       <div className="cpu-container">
         <div className="cpu-left">
           <RegisterPanel cpu={cpu} />
@@ -51,7 +42,7 @@ export const CPUView: React.FC<CPUViewProps> = ({
           />
         </div>
         <div className="cpu-center">
-          <InstructionPanel instructions={instructions} currentPC={cpu.PC} />
+          <InstructionPanel instructions={instructions} currentAddress={cpu.PC} />
           <OutputPanel output={output} />
         </div>
         <div className="cpu-right">

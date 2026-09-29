@@ -5,11 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build:datasrc": "node scripts/buildOpcodes.mjs",
+    "prestart": "node scripts/buildOpcodes.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "verify:e2e": "node scripts/runE2E.mjs",
+    "verify:demo": "node scripts/runDemos.mjs",
+    "verify:opcodes": "node scripts/verifyOpcodeTable.mjs",
+    "verify": "npm run verify:opcodes && npm run verify:demo && npm run verify:e2e"
   },
   "dependencies": {
+    "pnpm": "^12.5.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
@@ -26,5 +33,6 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12"
-  }
+  },
+  "packageManager": "pnpm@12.5.1+sha512.e3f305bc784a2bc89f5ad3b6138889470fae8d2af5f36b61216ec91c2c3d64089775f9de38aac331044ea40f245cb0d5666392dfdf65824e1907ef6a2c62de5f"
 }

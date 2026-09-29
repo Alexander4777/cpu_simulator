@@ -1,16 +1,17 @@
 import { useState, useCallback } from 'react';
 import { CPUView } from './components/CPUView';
 import { CodeEditor } from './components/CodeEditor';
-import type { CPUState, Instruction, Memory } from './types/cpu';
-import { assemble, EXAMPLE_PROGRAM } from './utils/assembler';
+import type { M68kCPUState, M68kInstruction, Memory } from './types/cpu';
 import { createInitialCPUState, createInitialMemory, executeCycle, loadProgram } from './utils/executor';
+import { assemble, EXAMPLE_PROGRAM } from './utils/assembler';
+import { JUMP_TABLE, CYCLES_TABLE, HANDLER_NAMES } from './utils/opcodeTable';
 import './App.css';
 
 function App() {
   const [code, setCode] = useState<string>(EXAMPLE_PROGRAM);
-  const [cpu, setCpu] = useState<CPUState>(createInitialCPUState());
+  const [cpu, setCpu] = useState<M68kCPUState>(createInitialCPUState());
   const [memory, setMemory] = useState<Memory>(createInitialMemory());
-  const [instructions, setInstructions] = useState<Instruction[]>([]);
+  const [instructions, setInstructions] = useState<M68kInstruction[]>([]);
   const [output, setOutput] = useState<string[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
@@ -22,7 +23,13 @@ function App() {
     setErrors(result.errors);
 
     if (result.errors.length === 0) {
-      setInstructions(result.instructions);
+      // Decorar instrucciones con nombre de handler y ciclos a partir del jump table.
+      const decorated = result.instructions.map(i => {
+        const op = i.opcodeWord;
+        const handler = HANDLER_NAMES[JUMP_TABLE[op]] ?? 'm68k_op_illegal';
+        return { ...i, handlerName: handler, cycles: CYCLES_TABLE[op] };
+      });
+      setInstructions(decorated);
       const newMemory = loadProgram(createInitialMemory(), result.binary);
       setMemory(newMemory);
       setCpu(createInitialCPUState());
@@ -40,36 +47,32 @@ function App() {
     setMemory(result.newMemory);
     setOutput(result.newOutput);
     setIsHalted(result.halted);
-    setCycleCount((c) => c + 1);
+    setCycleCount(c => c + (result.executionState.currentInstruction?.cycles ?? 4));
   }, [cpu, memory, output, isHalted, instructions]);
 
   const handleRun = useCallback(() => {
     if (isHalted || isRunning) return;
     setIsRunning(true);
 
-    const interval = setInterval(() => {
-      setCpu((prevCpu) => {
-        if (isHalted) {
-          clearInterval(interval);
-          setIsRunning(false);
-          return prevCpu;
-        }
-
-        const result = executeCycle(prevCpu, memory, output, null);
-        setMemory(result.newMemory);
-        setOutput(result.newOutput);
-        setIsHalted(result.halted);
-        setCycleCount((c) => c + 1);
-
-        if (result.halted) {
-          clearInterval(interval);
-          setIsRunning(false);
-        }
-
-        return result.newState;
+    let haltedLocal: boolean = isHalted;
+    const tick = () => {
+      if (haltedLocal) {
+        setIsRunning(false);
+        return;
+      }
+      setCpu(prevCpu => {
+        const r = executeCycle(prevCpu, memory, output, null);
+        setMemory(r.newMemory);
+        setOutput(r.newOutput);
+        setIsHalted(r.halted);
+        setCycleCount(c => c + (r.executionState.currentInstruction?.cycles ?? 4));
+        haltedLocal = r.halted;
+        if (r.halted) setIsRunning(false);
+        return r.newState;
       });
-    }, 100);
+    };
 
+    const interval = setInterval(tick, 100);
     return () => clearInterval(interval);
   }, [isHalted, isRunning, memory, output]);
 
@@ -85,8 +88,8 @@ function App() {
   return (
     <div className="app">
       <div className="app-header">
-        <h1>Simulador de CPU</h1>
-        <p>Ensambla y ejecuta programas en un CPU simulado</p>
+        <h1>Simulador de CPU M68K</h1>
+        <p>Ensambla y ejecuta programas Motorola 68000 (ISA desde opcodes.csv)</p>
       </div>
       <div className="app-content">
         <div className="editor-section">
